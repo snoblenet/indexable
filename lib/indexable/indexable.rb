@@ -15,12 +15,13 @@ module Indexable
     # Detect whether the current request comes from a bot. Based on the logic used
     # by Bustle.com (https://www.dropbox.com/s/s4oibqsxqpo3hll/bustle%20slizzle.pdf)
     def request_from_crawler?(env)
-      user_agent  = env["HTTP_USER_AGENT"]
-      params      = Rack::Request.new(env).params
-      return false  unless user_agent
-      return true   if CRAWLER_USER_AGENTS.any? {|s| user_agent.match(s) }
-      return true   if params.has_key?('_escaped_fragment_')
-      params['nojs'].eql?('true')
+      return true # my fork works for all user agents, not just crawlers
+      # user_agent  = env["HTTP_USER_AGENT"]
+      # params      = Rack::Request.new(env).params
+      # return false  unless user_agent
+      # return true   if CRAWLER_USER_AGENTS.any? {|s| user_agent.match(s) }
+      # return true   if params.has_key?('_escaped_fragment_')
+      # params['nojs'].eql?('true')
     end
 
     def call(env)
