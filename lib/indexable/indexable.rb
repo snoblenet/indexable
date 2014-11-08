@@ -3,7 +3,7 @@ require 'indexable/phantomjs'
 
 module Indexable
   class Middleware
-    CRAWLER_USER_AGENTS = [
+    PATHS_TO_PRERENDER = [
       /^Twitterbot/, /^curl/, /Googlebot/, /Mediapartners/, /Adsbot-Google/,
       /\(.*http(s|\(s\))?:\/\/.*\)/
     ]
