@@ -4,8 +4,7 @@ require 'indexable/phantomjs'
 module Indexable
   class Middleware
     PATHS_TO_PRERENDER = [
-      /^Twitterbot/, /^curl/, /Googlebot/, /Mediapartners/, /Adsbot-Google/,
-      /\(.*http(s|\(s\))?:\/\/.*\)/
+      /.+print/, /.+benchmarks/
     ]
 
     def initialize(app)
@@ -14,8 +13,10 @@ module Indexable
 
     # Detect whether the current request comes from a bot. Based on the logic used
     # by Bustle.com (https://www.dropbox.com/s/s4oibqsxqpo3hll/bustle%20slizzle.pdf)
-    def request_from_crawler?(env)
-      return true # my fork works for all user agents, not just crawlers
+    def request_for_prerendered_path?(env)
+      path = env["REQUEST_URI"]
+      return true if PATHS_TO_PRERENDER.any? {|s| path.match(s) } 
+      # my fork works for all user agents, not just crawlers
       # user_agent  = env["HTTP_USER_AGENT"]
       # params      = Rack::Request.new(env).params
       # return false  unless user_agent
@@ -27,7 +28,7 @@ module Indexable
     def call(env)
       status, headers, content = *@app.call(env)
 
-      if status == 200 and headers['Content-Type'].match(/^text\/html/) and request_from_crawler?(env)
+      if status == 200 and headers['Content-Type'].match(/^text\/html/) and request_for_prerendered_path?(env)
         script = ::File.dirname(__FILE__) + "/render_page.js"
         file = Tempfile.new(['indexable', '.html'])
 
